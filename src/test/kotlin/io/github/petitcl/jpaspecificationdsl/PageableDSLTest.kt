@@ -322,6 +322,12 @@ open class PageableDSLTest {
     }
 
     @Test
+    fun `Should allow to use sort aliases`() {
+        assertEquals(Actor::birthYear.asc(), Actor::birthYear.ascending())
+        assertEquals(Actor::birthYear.desc(), Actor::birthYear.descending())
+    }
+
+    @Test
     fun `Should allow to combine more than 2 orders`() {
         val result1 = sortedBy(
             Actor::birthYear.asc(),
