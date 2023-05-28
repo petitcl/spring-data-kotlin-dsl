@@ -44,15 +44,15 @@ open class PageableDSLTest {
         }
 
         actors = listOf(
-            bWhite,
-            cEastwood,
-            sConnery,
             mFreeman,
-            hFord,
+            cEastwood,
             rWilliams,
-            tHanks,
-            sBullock,
             kReeves,
+            hFord,
+            bWhite,
+            sBullock,
+            tHanks,
+            sConnery,
         )
     }
 
@@ -62,30 +62,40 @@ open class PageableDSLTest {
     }
 
     @Test
-    fun `Should allow to sort by single field asc`() {
-        val actors = actorRepo.findAll(
+    fun `Should allow to specify no sort`() {
+        val result = actorRepo.findAll(
             and(),
-            sortedBy(Actor::birthYear.asc())
+            unsorted()
         )
 
-        val expected = actors.sortedWith(compareBy { it.birthYear })
-        assertThat(actors, Matchers.equalTo(expected))
+        assertThat(result, Matchers.containsInAnyOrder(*actors.toTypedArray()))
+    }
+
+    @Test
+    fun `Should allow to sort by single field asc`() {
+        val result = actorRepo.findAll(
+            and(),
+            sortedBy(Actor::firstName.asc())
+        )
+
+        val expected = actors.sortedWith(compareBy { it.firstName })
+        assertThat(result, Matchers.equalTo(expected))
     }
 
     @Test
     fun `Should allow to sort by single field desc`() {
-        val actors = actorRepo.findAll(
+        val result = actorRepo.findAll(
             and(),
-            sortedBy(Actor::birthYear.desc())
+            sortedBy(Actor::firstName.desc())
         )
 
-        val expected = actors.sortedWith(compareByDescending { it.birthYear })
-        assertThat(actors, Matchers.equalTo(expected))
+        val expected = actors.sortedWith(compareByDescending { it.firstName })
+        assertThat(result, Matchers.equalTo(expected))
     }
 
     @Test
     fun `Should allow to sort by multiple fields with sortedBy without specifying direction`() {
-        val actors = actorRepo.findAll(
+        val result = actorRepo.findAll(
             and(),
             sortedBy(
                 Actor::birthYear,
@@ -94,12 +104,12 @@ open class PageableDSLTest {
         )
 
         val expected = this.actors.sortedWith(compareBy<Actor> { it.birthYear }.thenBy { it.firstName })
-        assertThat(actors, Matchers.equalTo(expected))
+        assertThat(result, Matchers.equalTo(expected))
     }
 
     @Test
     fun `Should allow to sort by multiple fields with sortedBy and different directions`() {
-        val actors = actorRepo.findAll(
+        val result = actorRepo.findAll(
             and(),
             sortedBy(
                 Actor::birthYear.asc(),
@@ -108,42 +118,142 @@ open class PageableDSLTest {
         )
 
         val expected = this.actors.sortedWith(compareBy<Actor> { it.birthYear }.thenByDescending { it.firstName })
-        assertThat(actors, Matchers.equalTo(expected))
+        assertThat(result, Matchers.equalTo(expected))
     }
 
     @Test
     fun `Should allow to sort by multiple fields with andThen without specifying direction`() {
-        val actors = actorRepo.findAll(
+        val result = actorRepo.findAll(
             and(),
             Actor::birthYear andThen Actor::firstName,
         )
 
         val expected = this.actors.sortedWith(compareBy<Actor> { it.birthYear }.thenBy { it.firstName })
-        assertThat(actors, Matchers.equalTo(expected))
+        assertThat(result, Matchers.equalTo(expected))
+    }
+
+    @Test
+    fun `Should allow to sort by multiple fields with direction then without direction`() {
+        val result = actorRepo.findAll(
+            and(),
+            Actor::birthYear.desc() andThen Actor::firstName,
+        )
+
+        val expected = this.actors.sortedWith(compareByDescending<Actor> { it.birthYear }.thenBy { it.firstName })
+        assertThat(result, Matchers.equalTo(expected))
     }
 
     @Test
     fun `Should allow to sort by multiple fields with and without specifying direction`() {
-        val actors = actorRepo.findAll(
+        val result = actorRepo.findAll(
             and(),
             Actor::birthYear andThen Actor::firstName.desc(),
         )
 
         val expected = this.actors.sortedWith(compareBy<Actor> { it.birthYear }.thenByDescending { it.firstName })
-        assertThat(actors, Matchers.equalTo(expected))
+        assertThat(result, Matchers.equalTo(expected))
     }
 
     @Test
     fun `Should allow to sort by multiple fields with andThen and different directions`() {
-        val actors = actorRepo.findAll(
+        val result = actorRepo.findAll(
             and(),
             Actor::birthYear.asc() andThen Actor::firstName.desc(),
         )
 
-        val expected = this.actors.sortedWith(compareBy<Actor> { it.birthYear }.thenByDescending { it.firstName })
-        println(actors)
-        println(expected)
-        assertThat(actors, Matchers.equalTo(expected))
+        val expected = this.actors
+            .sortedWith(compareBy<Actor> { it.birthYear }.thenByDescending { it.firstName })
+        assertThat(result, Matchers.equalTo(expected))
+    }
+
+    @Test
+    fun `Should allow to specify no page`() {
+        val result = actorRepo.findAll(
+            and(),
+            unpaged()
+        )
+
+        assertThat(result.content, Matchers.containsInAnyOrder(*actors.toTypedArray()))
+    }
+
+    @Test
+    fun `Should allow to specify a page`() {
+        val result = actorRepo.findAll(
+            and(),
+            paged(page = 0, size = 2)
+        )
+
+        val expected = this.actors.take(2)
+        assertThat(result.content, Matchers.equalTo(expected))
+    }
+
+    @Test
+    fun `Should allow to specify a page and sort on one field`() {
+        val result = actorRepo.findAll(
+            and(),
+            paged(page = 0, size = 2).sortedBy(Actor::firstName)
+        )
+
+        val expected = this.actors
+            .sortedWith(compareBy { it.firstName })
+            .take(2)
+        assertThat(result.content, Matchers.equalTo(expected))
+    }
+
+    @Test
+    fun `Should allow to specify a page and sort on one field with direction`() {
+        val result = actorRepo.findAll(
+            and(),
+            paged(page = 0, size = 2)
+                .sortedBy(Actor::firstName.desc())
+        )
+
+        val expected = this.actors
+            .sortedWith(compareByDescending { it.firstName })
+            .take(2)
+        assertThat(result.content, Matchers.equalTo(expected))
+    }
+
+    @Test
+    fun `Should allow to specify a page and sort on multiple fields without direction`() {
+        val result = actorRepo.findAll(
+            and(),
+            paged(page = 0, size = 2)
+                .sortedBy(Actor::birthYear, Actor::firstName)
+        )
+
+        val expected = this.actors
+            .sortedWith(compareBy<Actor> { it.birthYear }.thenBy { it.firstName })
+            .take(2)
+        assertThat(result.content, Matchers.equalTo(expected))
+    }
+
+    @Test
+    fun `Should allow to specify a page and sort on multiple fields with direction`() {
+        val result = actorRepo.findAll(
+            and(),
+            paged(page = 0, size = 2)
+                .sortedBy(Actor::birthYear.asc(), Actor::firstName.desc())
+        )
+
+        val expected = this.actors
+            .sortedWith(compareBy<Actor> { it.birthYear }.thenByDescending { it.firstName })
+            .take(2)
+        assertThat(result.content, Matchers.equalTo(expected))
+    }
+
+    @Test
+    fun `Should allow to specify a page and sort on multiple fields with direction using andThen`() {
+        val result = actorRepo.findAll(
+            and(),
+            paged(page = 0, size = 2)
+                .sortedBy(Actor::birthYear.asc() andThen Actor::firstName.desc())
+        )
+
+        val expected = this.actors
+            .sortedWith(compareBy<Actor> { it.birthYear }.thenByDescending { it.firstName })
+            .take(2)
+        assertThat(result.content, Matchers.equalTo(expected))
     }
 
     @Test
@@ -160,4 +270,30 @@ open class PageableDSLTest {
         )
     }
 
+    @Test
+    fun `Should allow to combine more than 2 orders`() {
+        val result1 = sortedBy(
+            Actor::birthYear.asc(),
+            Actor::firstName.desc(),
+            Actor::lastName.asc(),
+        )
+
+        val result2 = Actor::birthYear.asc() andThen Actor::firstName.desc() andThen Actor::lastName.asc()
+
+        val result3 = sortedBy(Actor::birthYear.asc()) andThen (Actor::firstName.desc() andThen Actor::lastName.asc())
+
+        val result4 =  Actor::birthYear andThen Actor::firstName.desc() andThen Actor::lastName
+
+        val expected = Sort.by(
+            Order.asc("birthYear"),
+            Order.desc("firstName"),
+            Order.asc("lastName"),
+        )
+        assertEquals(result1, expected)
+        assertEquals(result2, expected)
+        assertEquals(result3, expected)
+        assertEquals(result4, expected)
+    }
+
 }
+
