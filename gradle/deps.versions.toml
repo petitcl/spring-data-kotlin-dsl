@@ -1,0 +1,37 @@
+[versions]
+jakartaPersistenceApi = "2.2.3"
+junit = "5.5.2"
+kotlin = "1.8.21"
+h2 = "1.4.191"
+springData = "2.7.12"
+springBoot = "2.7.12"
+
+[libraries]
+# Kotlin
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+
+# Jakarta Persistence
+jakarta-persistenceApi = { module = "jakarta.persistence:jakarta.persistence-api", version.ref = "jakartaPersistenceApi" }
+
+# Spring
+springData-jpa = { module = "org.springframework.data:spring-data-jpa", version.ref = "springData" }
+springBoot-dataJpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "springBoot" }
+springBoot-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
+
+# H2
+h2 = { module = "com.h2database:h2", version.ref = "h2" }
+
+# Junit
+junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+
+[bundles]
+kotlin = [
+    "kotlin-stdlib",
+    "kotlin-reflect",
+]
+testBase = [
+    "junit-api",
+    "junit-engine",
+]
