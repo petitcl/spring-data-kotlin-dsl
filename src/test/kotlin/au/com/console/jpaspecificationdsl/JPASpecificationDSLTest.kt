@@ -11,11 +11,13 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.transaction.annotation.Transactional
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.junit.jupiter.SpringExtension
 
-
-@ExtendWith(SpringExtension::class)
 @SpringBootApplication
+open class TestApplication
+
+@SpringBootTest
 @Transactional
 open class JPASpecificationDSLTest {
 
