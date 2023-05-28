@@ -8,6 +8,8 @@ import kotlin.reflect.KProperty1
 // Entry points of the pageable DSL
 fun paged(page: Int, size: Int): PageRequest = PageRequest.of(page, size)
 
+fun limit(size: Int): PageRequest = PageRequest.of(0, size)
+
 //  for convenience
 fun unpaged(): Pageable = Pageable.unpaged()
 
@@ -23,15 +25,19 @@ fun sortedBy(vararg properties: KProperty1<*, *>): Sort {
 // For convenience
 fun unsorted(): Sort = Sort.unsorted()
 
-// These extension functions allow to connect a page request with a sort
+// These extension functions allow to page then sort
 fun PageRequest.sortedBy(sort: Sort): PageRequest = this.withSort(sort)
 
-// Allows to use page + sort / andThen
 fun PageRequest.sortedBy(vararg orders: Sort.Order): PageRequest
     = this.withSort(io.github.petitcl.jpaspecificationdsl.sortedBy(*orders))
 
 fun PageRequest.sortedBy(vararg properties: KProperty1<*, *>): PageRequest
     = this.withSort(io.github.petitcl.jpaspecificationdsl.sortedBy(*properties))
+
+
+// These extension functions allow to sort then page
+fun Sort.paged(page: Int, size: Int): PageRequest = PageRequest.of(page, size, this)
+fun Sort.limit(size: Int): PageRequest = PageRequest.of(0, size, this)
 
 
 // The following extension functions allow to use a property like a Sort.Order

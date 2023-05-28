@@ -188,6 +188,28 @@ open class PageableDSLTest {
     }
 
     @Test
+    fun `Should allow to specify a page greater than 0`() {
+        val result = actorRepo.findAll(
+            and(),
+            paged(page = 1, size = 2)
+        )
+
+        val expected = this.actors.drop(2).take(2)
+        assertThat(result.content, Matchers.equalTo(expected))
+    }
+
+    @Test
+    fun `Should allow to specify a limit`() {
+        val result = actorRepo.findAll(
+            and(),
+            limit(2)
+        )
+
+        val expected = this.actors.take(2)
+        assertThat(result.content, Matchers.equalTo(expected))
+    }
+
+    @Test
     fun `Should allow to specify a page and sort on one field`() {
         val result = actorRepo.findAll(
             and(),
@@ -238,6 +260,35 @@ open class PageableDSLTest {
 
         val expected = this.actors
             .sortedWith(compareBy<Actor> { it.birthYear }.thenByDescending { it.firstName })
+            .take(2)
+        assertThat(result.content, Matchers.equalTo(expected))
+    }
+
+    @Test
+    fun `Should allow to specify a sort then a page`() {
+        val result = actorRepo.findAll(
+            and(),
+            sortedBy(Actor::birthYear.desc())
+                .paged(page = 1, size = 2)
+        )
+
+        val expected = this.actors
+            .sortedWith(compareByDescending { it.birthYear })
+            .drop(2)
+            .take(2)
+        assertThat(result.content, Matchers.equalTo(expected))
+    }
+
+    @Test
+    fun `Should allow to specify a sort then a limit`() {
+        val result = actorRepo.findAll(
+            and(),
+            sortedBy(Actor::birthYear.desc())
+                .limit(2)
+        )
+
+        val expected = this.actors
+            .sortedWith(compareByDescending { it.birthYear })
             .take(2)
         assertThat(result.content, Matchers.equalTo(expected))
     }
