@@ -3,26 +3,25 @@
 [![License](http://img.shields.io/:license-apache-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [ ![Download](https://api.bintray.com/packages/consoleau/kotlin/kotlin-jpa-specification-dsl/images/download.svg) ](https://bintray.com/consoleau/kotlin/kotlin-jpa-specification-dsl/_latestVersion)
 
-This library provides a fluent DSL for querying spring data JPA repositories using spring data Specifications (i.e. the JPA Criteria API), without boilerplate code or a generated metamodel.
+This library provides a fluent DSL for querying spring data JPA repositories using spring data Specifications (i.e. the JPA Criteria API),
+without boilerplate code or a generated metamodel / compiler plugins.
 
-Hat tip to [Mike Buhot](https://github.com/mbuhot) for the initial implementation.
+This library is a fork of https://github.com/consoleau/kotlin-jpa-specification-dsl, with the added following features:
+- Support for Spring Boot 3.x / Jarkarta EE 10 / Jakarta Persistence API 3.x
+- DSL for Spring data common paging and sorting 
 
 # Quick Start
 
-```groovy
-repositories {
-    jcenter()
-}
-
+```kotlin
 dependencies {
-    compile("au.com.console:kotlin-jpa-specification-dsl:2.0.0")
+    implementation("io.github.petitcl:kotlin-jpa-specification-dsl:$kotlinJpaSpecificationDslVersion")
 }
 ```
 
 # Example #
 
 ```kotlin
-import au.com.console.jpaspecificationdsl.*   // 1. Import Kotlin magic
+import io.github.petitcl.jpaspecificationdsl.*   // 1. Import extension functions
 
 ////
 // 2. Declare JPA Entities
@@ -35,15 +34,17 @@ data class TvShow(
     val synopsis: String = "",
     val availableOnNetflix: Boolean = false,
     val releaseDate: String? = null,
-    @OneToMany(cascade = arrayOf(javax.persistence.CascadeType.ALL))
-    val starRatings: Set<StarRating> = emptySet())
+    @OneToMany(cascade = [CascadeType.ALL])
+    val starRatings: Set<StarRating> = emptySet()
+)
 
 @Entity
 data class StarRating(
     @Id
     @GeneratedValue
     val id: Int = 0,
-    val stars: Int = 0)
+    val stars: Int = 0
+)
 
 
 ////
@@ -64,6 +65,14 @@ class MyService @Inject constructor(val tvShowRepo: TvShowRepository) {
    fun findShowsWithComplexQuery(): List<TvShow> {
        return tvShowRepo.findAll(where { equal(it.join(TvShow::starRatings).get(StarRating::stars), 2) })
    }
+
+   fun findFirst10ShowsOnNetflixOrderedByNameDesc(): List<TvShow> {
+       return tvShowRepo.findAll(
+           TvShow::availableOnNetflix.isTrue(),
+           paged(page = 0, size = 10).sortedBy(TvShow::name.desc()),
+       )
+   }
+
 }
 ```
 
@@ -139,7 +148,7 @@ Or they can be combined with a service-layer query DTO and mapping extension fun
     )
 ```
 
-for powerful dynamic queries:
+For powerful dynamic queries:
 
 ```kotlin
     val query = TvShowQuery(availableOnNetflix = false, keywords = listOf("Rick", "Jimmy"))
@@ -150,9 +159,14 @@ For more details, refer to `JPASpecificationDSLTest.kt` in the unit tests.
 
 # How it works #
 
-This DSL builds on [Spring Data's Specifications abstraction](http://docs.spring.io/spring-data/jpa/docs/current/reference/html/#specifications), sprinkling some Kotlin sugar over it to remove the boilerplate and the need to generate a metamodel.
+This DSL builds on [Spring Data's Specifications abstraction](http://docs.spring.io/spring-data/jpa/docs/current/reference/html/#specifications),
+sprinkling some Kotlin sugar over it to remove the boilerplate and the need to generate a metamodel.
 
-The code `TvShow::releaseDate.equal("2010")` is a call to the Kotlin extension function:
+The basic idea is to add extension functions to Kotlin's `KProperty` class, which is the reflection API representation of a Kotlin property.
+The extension functions each represent a database operator (eg: `equal`, `like`, `greaterThan`, etc...) and are then used to build a `Specification` object,
+which is then passed to the Spring Data repository.
+
+For example, The code `TvShow::releaseDate.equal("2010")` is a call to the Kotlin extension function:
 
 ```kotlin
 fun <T, R> KProperty1<T, R?>.equal(x: R): Specification<T> = spec { equal(it, x) }
@@ -162,7 +176,8 @@ This is a bit dense, but makes sense when it's broken down:
 
 - `T`: The type of the object that the property is declared on, in this case TvShow
 - `R`: The property type, for TvShow::releaseDate it is String
-- `KProperty1<T,R?>`: Kotlin reflection API representation of the property `TvShow::releaseDate`. The 1 refers to a property with 1 receiver, and `R?` is declared as nullable for the method to work on nullable properties as well as non-null properties.
+- `KProperty1<T,R?>`: Kotlin reflection API representation of the property `TvShow::releaseDate`. 
+The 1 refers to a property with 1 receiver, and `R?` is declared as nullable for the method to work on nullable properties as well as non-null properties.
 - `x`: The value to test against
 - `Specification<T>`: The Spring data specifications result
 
@@ -196,7 +211,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,

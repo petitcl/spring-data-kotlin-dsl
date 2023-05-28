@@ -1,4 +1,4 @@
-package au.com.console.jpaspecificationdsl
+package io.github.petitcl.jpaspecificationdsl
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
