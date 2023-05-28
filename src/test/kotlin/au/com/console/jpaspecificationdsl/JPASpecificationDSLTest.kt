@@ -30,26 +30,32 @@ open class JPASpecificationDSLTest {
     fun setup() {
         with(tvShowRepo) {
             hemlockGrove = save(
-                    TvShow(
-                            name = "Hemlock Grove",
-                            availableOnNetflix = true,
-                            synopsis = "A teenage girl is brutally murdered, sparking a hunt for her killer. But in a town where everyone hides a secret, will they find the monster among them?",
-                            releaseDate = "2013"))
+                TvShow(
+                    name = "Hemlock Grove",
+                    availableOnNetflix = true,
+                    synopsis = "A teenage girl is brutally murdered, sparking a hunt for her killer. But in a town where everyone hides a secret, will they find the monster among them?",
+                    releaseDate = "2013"
+                )
+            )
 
             theWalkingDead = save(
-                    TvShow(
-                            name = "The Walking Dead",
-                            availableOnNetflix = false,
-                            synopsis = "Sheriff Deputy Rick Grimes leads a group of survivors in a world overrun by the walking dead. Fighting the dead, fearing the living.",
-                            releaseDate = "2010",
-                            starRatings = setOf(StarRating(stars = 3), StarRating(stars = 4))))
+                TvShow(
+                    name = "The Walking Dead",
+                    availableOnNetflix = false,
+                    synopsis = "Sheriff Deputy Rick Grimes leads a group of survivors in a world overrun by the walking dead. Fighting the dead, fearing the living.",
+                    releaseDate = "2010",
+                    starRatings = setOf(StarRating(stars = 3), StarRating(stars = 4))
+                )
+            )
 
             betterCallSaul = save(
-                    TvShow(
-                            name = "Better Call Saul",
-                            availableOnNetflix = false,
-                            synopsis = "The trials and tribulations of criminal lawyer, Jimmy McGill, in the time leading up to establishing his strip-mall law office in Albuquerque, New Mexico.",
-                            starRatings = setOf(StarRating(stars = 4), StarRating(stars = 2))))
+                TvShow(
+                    name = "Better Call Saul",
+                    availableOnNetflix = false,
+                    synopsis = "The trials and tribulations of criminal lawyer, Jimmy McGill, in the time leading up to establishing his strip-mall law office in Albuquerque, New Mexico.",
+                    starRatings = setOf(StarRating(stars = 4), StarRating(stars = 2))
+                )
+            )
         }
     }
 
@@ -62,10 +68,10 @@ open class JPASpecificationDSLTest {
      * A TV show query DTO - typically used at the service layer.
      */
     data class TvShowQuery(
-            val name: String? = null,
-            val availableOnNetflix: Boolean? = null,
-            val keywords: List<String> = listOf(),
-            val releaseDates: List<String> = listOf()
+        val name: String? = null,
+        val availableOnNetflix: Boolean? = null,
+        val keywords: List<String> = listOf(),
+        val releaseDates: List<String> = listOf()
     )
 
     /**
@@ -73,17 +79,17 @@ open class JPASpecificationDSLTest {
      * Note: any criteria that is null will be ignored (not included in the query).
      */
     fun TvShowQuery.toSpecification(): Specification<TvShow> = and(
-            hasName(name),
-            availableOnNetflix(availableOnNetflix),
-            hasKeywordIn(keywords),
-            hasReleaseDateIn(releaseDates)
+        hasName(name),
+        availableOnNetflix(availableOnNetflix),
+        hasKeywordIn(keywords),
+        hasReleaseDateIn(releaseDates)
     )
 
     /**
      * A collection of TvShowQueries is equivalent to an OR of all the queries in the collection.
      */
     fun Iterable<TvShowQuery>.toSpecification(): Specification<TvShow> = or(
-            map { query -> query.toSpecification() }
+        map { query -> query.toSpecification() }
     )
 
     @Test
@@ -277,8 +283,12 @@ open class JPASpecificationDSLTest {
     @Test
     fun `Find tv shows by multiple query DTOs`() {
         val queries = listOf(
-                TvShowQuery(availableOnNetflix = false, keywords = listOf("Jimmy")),
-                TvShowQuery(availableOnNetflix = true, keywords = listOf("killer", "monster"), releaseDates = listOf("2010", "2013"))
+            TvShowQuery(availableOnNetflix = false, keywords = listOf("Jimmy")),
+            TvShowQuery(
+                availableOnNetflix = true,
+                keywords = listOf("killer", "monster"),
+                releaseDates = listOf("2010", "2013")
+            )
         )
         val shows = tvShowRepo.findAll(queries.toSpecification())
         assertThat(shows, containsInAnyOrder(betterCallSaul, hemlockGrove))
@@ -293,29 +303,31 @@ open class JPASpecificationDSLTest {
 
     @Test
     fun `Find tv shows by inlined query`() {
-        val shows = tvShowRepo.findAll(and(
+        val shows = tvShowRepo.findAll(
+            and(
                 availableOnNetflix(false),
                 hasKeywordIn(listOf("Rick", "Jimmy"))
-        ))
+            )
+        )
         assertThat(shows, containsInAnyOrder(betterCallSaul, theWalkingDead))
     }
 
     @Test
     fun `Find tv shows by complex inlined query`() {
         val shows = tvShowRepo.findAll(
-                or(
-                        and(
-                                availableOnNetflix(false),
-                                hasKeywordIn(listOf("Jimmy"))
-                        ),
-                        and(
-                                availableOnNetflix(true),
-                                or(
-                                        hasKeyword("killer"),
-                                        hasKeyword("monster")
-                                )
-                        )
+            or(
+                and(
+                    availableOnNetflix(false),
+                    hasKeywordIn(listOf("Jimmy"))
+                ),
+                and(
+                    availableOnNetflix(true),
+                    or(
+                        hasKeyword("killer"),
+                        hasKeyword("monster")
+                    )
                 )
+            )
         )
         assertThat(shows, containsInAnyOrder(betterCallSaul, hemlockGrove))
     }

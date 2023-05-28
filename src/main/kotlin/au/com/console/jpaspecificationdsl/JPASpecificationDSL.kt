@@ -24,9 +24,10 @@ fun <T, R> KProperty1<T, R?>.equal(x: R): Specification<T> = spec { equal(it, x)
 fun <T, R> KProperty1<T, R?>.notEqual(x: R): Specification<T> = spec { notEqual(it, x) }
 
 // Ignores empty collection otherwise an empty 'in' predicate will be generated which will never match any results
-fun <T, R : Any> KProperty1<T, R?>.`in`(values: Collection<R>): Specification<T> = if (values.isNotEmpty()) spec { path ->
-    `in`(path).apply { values.forEach { this.value(it) } }
-} else Specification.where(null)!!
+fun <T, R : Any> KProperty1<T, R?>.`in`(values: Collection<R>): Specification<T> =
+    if (values.isNotEmpty()) spec { path ->
+        `in`(path).apply { values.forEach { this.value(it) } }
+    } else Specification.where(null)!!
 
 // Comparison
 fun <T> KProperty1<T, Number?>.le(x: Number) = spec { le(it, x) }
@@ -62,7 +63,8 @@ fun <T> KProperty1<T, String?>.like(x: String): Specification<T> = spec { like(i
 
 fun <T> KProperty1<T, String?>.like(x: String, escapeChar: Char): Specification<T> = spec { like(it, x, escapeChar) }
 fun <T> KProperty1<T, String?>.notLike(x: String): Specification<T> = spec { notLike(it, x) }
-fun <T> KProperty1<T, String?>.notLike(x: String, escapeChar: Char): Specification<T> = spec { notLike(it, x, escapeChar) }
+fun <T> KProperty1<T, String?>.notLike(x: String, escapeChar: Char): Specification<T> =
+    spec { notLike(it, x, escapeChar) }
 
 // And
 infix fun <T> Specification<T>.and(other: Specification<T>): Specification<T> = this.and(other)!!
@@ -90,8 +92,10 @@ inline fun <reified T> or(specs: Iterable<Specification<T>?>): Specification<T> 
 operator fun <T> Specification<T>.not(): Specification<T> = Specification.not(this)
 
 // Combines Specification with an operation
-inline fun <reified T> combineSpecification(specs: Iterable<Specification<T>?>,
-    operation: Specification<T>.(Specification<T>) -> Specification<T>): Specification<T> {
+inline fun <reified T> combineSpecification(
+    specs: Iterable<Specification<T>?>,
+    operation: Specification<T>.(Specification<T>) -> Specification<T>
+): Specification<T> {
     return specs.filterNotNull().fold(emptySpecification()) { existing, new -> existing.operation(new) }
 }
 
