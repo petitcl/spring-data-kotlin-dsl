@@ -200,7 +200,6 @@ The `makePredicate` function passed to `spec` is an extension function on `Crite
 # TODO
 - Allow to sort before paging
 - DSL for doing query + sort + paging
-- Add DSL Marker on methods
 - Different modules for JPA / Spring Data common
 - Publish to Maven / Github
 
