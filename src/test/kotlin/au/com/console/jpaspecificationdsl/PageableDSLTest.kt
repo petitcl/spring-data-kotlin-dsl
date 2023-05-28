@@ -3,10 +3,13 @@ package au.com.console.jpaspecificationdsl
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.domain.Sort
+import org.springframework.data.domain.Sort.Order
 import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
@@ -142,4 +145,19 @@ open class PageableDSLTest {
         println(expected)
         assertThat(actors, Matchers.equalTo(expected))
     }
+
+    @Test
+    fun `Should allow to use Sort Order functions`() {
+        assertEquals(Actor::birthYear.asc(), Order.by("birthYear"))
+        assertEquals(Actor::birthYear.desc(), Order(Sort.Direction.DESC, "birthYear"))
+        assertEquals(Actor::birthYear.nullsFirst(), Order.by("birthYear").nullsFirst())
+        assertEquals(Actor::birthYear.nullsLast(), Order.by("birthYear").nullsLast())
+        assertEquals(Actor::birthYear.nullsNative(), Order.by("birthYear").nullsNative())
+        assertEquals(Actor::birthYear.ignoreCase(), Order.by("birthYear").ignoreCase())
+        assertEquals(
+            Actor::birthYear.desc().nullsFirst().ignoreCase(),
+            Order(Sort.Direction.DESC, "birthYear").nullsFirst().ignoreCase(),
+        )
+    }
+
 }
