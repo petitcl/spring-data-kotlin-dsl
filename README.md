@@ -197,6 +197,11 @@ Once it has a `Path<R>` to work with, it delegates to the `makePredicate` functi
 The `makePredicate` function passed to `spec` is an extension function on `CriteraiBuilder`. So when `equal(it, x)` is called from inside the `spec` block, it is invoking `CriteriaBuilder::equal`.
 
 
+# TODO
+- Allow to sort before paging
+- DSL for doing query + sort + paging
+- Add DSL Marker on methods
+
 # Contributing to the Project #
 
 If you'd like to contribute code to this project you can do so through GitHub by forking the repository and generating a pull request.
