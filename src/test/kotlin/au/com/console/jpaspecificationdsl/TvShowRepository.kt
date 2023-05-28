@@ -4,6 +4,7 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
+import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
@@ -21,7 +22,7 @@ data class TvShow(
     val synopsis: String = "",
     val availableOnNetflix: Boolean = false,
     val releaseDate: String? = null,
-    @OneToMany(cascade = kotlin.arrayOf(javax.persistence.CascadeType.ALL))
+    @OneToMany(cascade = [CascadeType.ALL])
     val starRatings: Set<StarRating> = emptySet()
 )
 
