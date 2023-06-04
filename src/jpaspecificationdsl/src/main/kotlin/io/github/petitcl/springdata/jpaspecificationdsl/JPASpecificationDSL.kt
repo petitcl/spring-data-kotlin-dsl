@@ -1,4 +1,4 @@
-package io.github.petitcl.jpaspecificationdsl
+package io.github.petitcl.springdata.jpaspecificationdsl
 
 import org.springframework.data.jpa.domain.Specification
 import javax.persistence.criteria.*
@@ -27,7 +27,7 @@ fun <T, R> KProperty1<T, R?>.notEqual(x: R): Specification<T> = spec { notEqual(
 fun <T, R : Any> KProperty1<T, R?>.`in`(values: Collection<R>): Specification<T> =
     if (values.isNotEmpty()) spec { path ->
         `in`(path).apply { values.forEach { this.value(it) } }
-    } else Specification.where(null)!!
+    } else Specification.where(null)
 
 // Comparison
 fun <T> KProperty1<T, Number?>.le(x: Number) = spec { le(it, x) }
@@ -67,7 +67,7 @@ fun <T> KProperty1<T, String?>.notLike(x: String, escapeChar: Char): Specificati
     spec { notLike(it, x, escapeChar) }
 
 // And
-infix fun <T> Specification<T>.and(other: Specification<T>): Specification<T> = this.and(other)!!
+infix fun <T> Specification<T>.and(other: Specification<T>): Specification<T> = this.and(other)
 
 inline fun <reified T> and(vararg specs: Specification<T>?): Specification<T> {
     return and(specs.toList())
@@ -78,7 +78,7 @@ inline fun <reified T> and(specs: Iterable<Specification<T>?>): Specification<T>
 }
 
 // Or
-infix fun <T> Specification<T>.or(other: Specification<T>): Specification<T> = this.or(other)!!
+infix fun <T> Specification<T>.or(other: Specification<T>): Specification<T> = this.or(other)
 
 inline fun <reified T> or(vararg specs: Specification<T>?): Specification<T> {
     return or(specs.toList())
@@ -100,4 +100,4 @@ inline fun <reified T> combineSpecification(
 }
 
 // Empty Specification
-inline fun <reified T> emptySpecification(): Specification<T> = Specification.where(null)!!
+inline fun <reified T> emptySpecification(): Specification<T> = Specification.where(null)

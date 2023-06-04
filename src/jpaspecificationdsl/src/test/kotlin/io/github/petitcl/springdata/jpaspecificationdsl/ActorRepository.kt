@@ -1,4 +1,4 @@
-package io.github.petitcl.jpaspecificationdsl
+package io.github.petitcl.springdata.jpaspecificationdsl
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.repository.CrudRepository

@@ -1,15 +1,12 @@
-package io.github.petitcl.jpaspecificationdsl
+package io.github.petitcl.springdata.jpaspecificationdsl
 
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.domain.Sort
-import org.springframework.data.domain.Sort.Order
 import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
@@ -305,51 +302,6 @@ open class PageableDSLTest {
             .sortedWith(compareBy<Actor> { it.birthYear }.thenByDescending { it.firstName })
             .take(2)
         assertThat(result.content, Matchers.equalTo(expected))
-    }
-
-    @Test
-    fun `Should allow to use Sort Order functions`() {
-        assertEquals(Actor::birthYear.asc(), Order.by("birthYear"))
-        assertEquals(Actor::birthYear.desc(), Order(Sort.Direction.DESC, "birthYear"))
-        assertEquals(Actor::birthYear.nullsFirst(), Order.by("birthYear").nullsFirst())
-        assertEquals(Actor::birthYear.nullsLast(), Order.by("birthYear").nullsLast())
-        assertEquals(Actor::birthYear.nullsNative(), Order.by("birthYear").nullsNative())
-        assertEquals(Actor::birthYear.ignoreCase(), Order.by("birthYear").ignoreCase())
-        assertEquals(
-            Actor::birthYear.desc().nullsFirst().ignoreCase(),
-            Order(Sort.Direction.DESC, "birthYear").nullsFirst().ignoreCase(),
-        )
-    }
-
-    @Test
-    fun `Should allow to use sort aliases`() {
-        assertEquals(Actor::birthYear.asc(), Actor::birthYear.ascending())
-        assertEquals(Actor::birthYear.desc(), Actor::birthYear.descending())
-    }
-
-    @Test
-    fun `Should allow to combine more than 2 orders`() {
-        val result1 = sortedBy(
-            Actor::birthYear.asc(),
-            Actor::firstName.desc(),
-            Actor::lastName.asc(),
-        )
-
-        val result2 = Actor::birthYear.asc() andThen Actor::firstName.desc() andThen Actor::lastName.asc()
-
-        val result3 = sortedBy(Actor::birthYear.asc()) andThen (Actor::firstName.desc() andThen Actor::lastName.asc())
-
-        val result4 =  Actor::birthYear andThen Actor::firstName.desc() andThen Actor::lastName
-
-        val expected = Sort.by(
-            Order.asc("birthYear"),
-            Order.desc("firstName"),
-            Order.asc("lastName"),
-        )
-        assertEquals(result1, expected)
-        assertEquals(result2, expected)
-        assertEquals(result3, expected)
-        assertEquals(result4, expected)
     }
 
 }

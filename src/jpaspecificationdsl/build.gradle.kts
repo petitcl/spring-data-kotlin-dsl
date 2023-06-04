@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    api(projects.src.commondsl)
     api(libs.springData.jpa)
     api(libs.bundles.kotlin)
     compileOnly(libs.jakarta.persistenceApi)
