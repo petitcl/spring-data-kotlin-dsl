@@ -1,4 +1,4 @@
-package io.github.petitcl.springdata.jpasdsl
+package io.github.petitcl.springdata.commondsl
 
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -29,10 +29,10 @@ fun unsorted(): Sort = Sort.unsorted()
 fun PageRequest.sortedBy(sort: Sort): PageRequest = this.withSort(sort)
 
 fun PageRequest.sortedBy(vararg orders: Sort.Order): PageRequest
-    = this.withSort(io.github.petitcl.springdata.jpasdsl.sortedBy(*orders))
+    = this.withSort(io.github.petitcl.springdata.commondsl.sortedBy(*orders))
 
 fun PageRequest.sortedBy(vararg properties: KProperty1<*, *>): PageRequest
-    = this.withSort(io.github.petitcl.springdata.jpasdsl.sortedBy(*properties))
+    = this.withSort(io.github.petitcl.springdata.commondsl.sortedBy(*properties))
 
 
 // These extension functions allow to sort then page

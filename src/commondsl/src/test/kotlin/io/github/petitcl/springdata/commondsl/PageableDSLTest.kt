@@ -1,4 +1,4 @@
-package io.github.petitcl.springdata.jpasdsl
+package io.github.petitcl.springdata.commondsl
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test

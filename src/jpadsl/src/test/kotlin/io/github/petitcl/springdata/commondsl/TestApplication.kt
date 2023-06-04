@@ -1,4 +1,4 @@
-package io.github.petitcl.springdata.jpasdsl
+package io.github.petitcl.springdata.commondsl
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 
