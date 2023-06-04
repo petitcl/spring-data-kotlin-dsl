@@ -5,6 +5,10 @@ on:
     branches:
       - 'main'
       - 'releases/**'
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
 
 jobs:
   build-gradle-project:
