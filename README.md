@@ -2,11 +2,8 @@
 
 # Spring Data Kotlin DSL
 
-[//]: # ([![Build Status]&#40;https://travis-ci.org/consoleau/kotlin-jpa-specification-dsl.svg?branch=master&#41;]&#40;https://travis-ci.org/consoleau/kotlin-jpa-specification-dsl&#41;)
-
-[//]: # ([![License]&#40;http://img.shields.io/:license-apache-blue.svg?style=flat-square&#41;]&#40;http://www.apache.org/licenses/LICENSE-2.0.html&#41;)
-
-[//]: # ([ ![Download]&#40;https://api.bintray.com/packages/consoleau/kotlin/kotlin-jpa-specification-dsl/images/download.svg&#41; ]&#40;https://bintray.com/consoleau/kotlin/kotlin-jpa-specification-dsl/_latestVersion&#41;)
+[![Build Status](https://github.com/petitcl/spring-data-kotlin-dsl/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/petitcl/spring-data-kotlin-dsl/actions/workflows/build.yaml/badge.svg?branch=main)
+[![License](http://img.shields.io/:license-apache-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 This library provides a fluent DSL for querying spring data JPA repositories using spring data Specifications (i.e. the JPA Criteria API),
 without boilerplate code or a generated metamodel / compiler plugins.
