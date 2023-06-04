@@ -14,14 +14,14 @@ import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 @Transactional
-open class JPASpecificationDSLTest {
+open class JPASpecificationDSLIntTest {
 
     @Autowired
-    lateinit var tvShowRepo: TvShowRepository
+    private lateinit var tvShowRepo: TvShowRepository
 
-    lateinit var hemlockGrove: TvShow
-    lateinit var theWalkingDead: TvShow
-    lateinit var betterCallSaul: TvShow
+    private lateinit var hemlockGrove: TvShow
+    private lateinit var theWalkingDead: TvShow
+    private lateinit var betterCallSaul: TvShow
 
     @BeforeEach
     fun setup() {

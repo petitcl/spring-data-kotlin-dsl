@@ -11,10 +11,10 @@ import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 @Transactional
-open class PageableDSLTest {
+open class PageableDSLIntTest {
 
     @Autowired
-    lateinit var actorRepo: ActorRepository
+    private lateinit var actorRepo: ActorRepository
     private lateinit var bWhite: Actor
     private lateinit var cEastwood: Actor
     private lateinit var sConnery: Actor
