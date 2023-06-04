@@ -283,12 +283,12 @@ open class PageableDSLTest {
     fun `Should allow to specify a sort then a limit`() {
         val result = actorRepo.findAll(
             and(),
-            sortedBy(Actor::birthYear.desc())
+            sortedBy(Actor::firstName.desc())
                 .limit(2)
         )
 
         val expected = this.actors
-            .sortedWith(compareByDescending { it.birthYear })
+            .sortedWith(compareByDescending { it.firstName })
             .take(2)
         assertThat(result.content, Matchers.equalTo(expected))
     }
