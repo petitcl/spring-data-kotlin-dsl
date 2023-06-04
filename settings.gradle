@@ -1,4 +1,4 @@
-rootProject.name = 'kotlin-jpa-specification-dsl'
+rootProject.name = 'spring-data-kotlin-dsl'
 
 include("src:commondsl")
 include("src:jpaspecificationdsl")

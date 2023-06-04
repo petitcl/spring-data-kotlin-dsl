@@ -1,6 +1,6 @@
 ### ⚠️⚠️⚠️ **This project is a work in progress.** ⚠️⚠️⚠️
 
-# Spring Data JPA Specification DSL for Kotlin
+# Spring Data Kotlin DSL
 
 [//]: # ([![Build Status]&#40;https://travis-ci.org/consoleau/kotlin-jpa-specification-dsl.svg?branch=master&#41;]&#40;https://travis-ci.org/consoleau/kotlin-jpa-specification-dsl&#41;)
 
@@ -19,7 +19,7 @@ This library is a fork of https://github.com/consoleau/kotlin-jpa-specification-
 
 ```kotlin
 dependencies {
-    implementation("io.github.petitcl:kotlin-jpa-specification-dsl:$kotlinJpaSpecificationDslVersion")
+    implementation("io.github.petitcl:spring-data-kotlin-dsl:$kotlinJpaSpecificationDslVersion")
 }
 ```
 
