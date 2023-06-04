@@ -16,6 +16,7 @@ jakarta-persistenceApi = { module = "jakarta.persistence:jakarta.persistence-api
 
 # Spring
 springData-jpa = { module = "org.springframework.data:spring-data-jpa", version.ref = "springData" }
+springData-commons = { module = "org.springframework.data:spring-data-commons", version.ref = "springData" }
 springBoot-dataJpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "springBoot" }
 springBoot-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
 

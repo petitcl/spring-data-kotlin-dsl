@@ -1,5 +1,8 @@
 rootProject.name = 'kotlin-jpa-specification-dsl'
 
+include("src:commondsl")
+include("src:jpaspecificationdsl")
+
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 dependencyResolutionManagement {
     versionCatalogs {
