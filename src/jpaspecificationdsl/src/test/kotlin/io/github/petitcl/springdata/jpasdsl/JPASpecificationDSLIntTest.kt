@@ -1,4 +1,4 @@
-package io.github.petitcl.springdata.jpaspecificationdsl
+package io.github.petitcl.springdata.jpasdsl
 
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers

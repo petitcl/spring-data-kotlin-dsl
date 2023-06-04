@@ -1,4 +1,4 @@
-package io.github.petitcl.springdata.jpaspecificationdsl
+package io.github.petitcl.springdata.jpasdsl
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
