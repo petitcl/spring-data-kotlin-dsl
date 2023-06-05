@@ -5,27 +5,35 @@
 [![Build Status](https://github.com/petitcl/spring-data-kotlin-dsl/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/petitcl/spring-data-kotlin-dsl/actions/workflows/build.yaml/badge.svg?branch=main)
 [![License](http://img.shields.io/:license-apache-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-This library provides a fluent DSL for querying spring data JPA repositories using spring data Specifications (i.e. the JPA Criteria API),
-without boilerplate code or a generated metamodel / compiler plugins.
+This library provides fluent and type safe DSLs for working with Spring Data repositories, without boilerplate code or generated metamodel / compiler plugins.
+This library currently offers the following DSLs:
+- Spring Data Common Paging and Sorting DSL
+- Spring Data JPA specification DSL, based on the JPA Criteria API
 
-This library is a fork of https://github.com/consoleau/kotlin-jpa-specification-dsl, with the added following features:
-- Support for Spring Boot 3.x / Jarkarta EE 10 / Jakarta Persistence API 3.x
-- DSL for Spring data common paging and sorting 
+Originally, this library started as a fork of [consoleau/kotlin-jpa-specification-dsl](https://github.com/consoleau/kotlin-jpa-specification-dsl),
+in order to add support for Spring Boot 3.x, but it evolved into a set of DSLs for Spring Data Common and Spring Data JPA.
 
-# Quick Start
+## Quick Start
 
 ```kotlin
 dependencies {
-    implementation("io.github.petitcl:spring-data-kotlin-dsl:$kotlinJpaSpecificationDslVersion")
+    implementation("io.github.petitcl:spring-data-jpa-kotlin-dsl:$springDataJpaKotlinDslVersion")
 }
 ```
 
-# Example #
+Or, if you just want to use the Spring Data Common DSL:
+```kotlin
+dependencies {
+    implementation("io.github.petitcl:spring-data-common-kotlin-dsl:$springDataCommonKotlinDslVersion")
+}
+```
+
+
+## Spring Data JPA specification DSL
 
 ```kotlin
-import io.github.petitcl.jpaspecificationdsl.*   // 1. Import extension functions
+import io.github.petitcl.springdata.jpadsl.*   // 1. Import extension functions
 
-////
 // 2. Declare JPA Entities
 @Entity
 data class TvShow(
@@ -49,13 +57,11 @@ data class StarRating(
 )
 
 
-////
 // 3. Declare JPA Repository with JpaSpecificationExecutor
 @Repository
 interface TvShowRepository : CrudRepository<TvShow, Int>, JpaSpecificationExecutor<TvShow>
 
 
-////
 // 4. Kotlin Properties are now usable to create fluent specifications
 @Service
 class MyService @Inject constructor(val tvShowRepo: TvShowRepository) {
@@ -68,6 +74,7 @@ class MyService @Inject constructor(val tvShowRepo: TvShowRepository) {
        return tvShowRepo.findAll(where { equal(it.join(TvShow::starRatings).get(StarRating::stars), 2) })
    }
 
+   /* Using paging and sorting DSL alongside the specification DSL */ 
    fun findFirst10ShowsOnNetflixOrderedByNameDesc(): List<TvShow> {
        return tvShowRepo.findAll(
            TvShow::availableOnNetflix.isTrue(),
@@ -78,7 +85,7 @@ class MyService @Inject constructor(val tvShowRepo: TvShowRepository) {
 }
 ```
 
-# Advanced Usage #
+### Advanced Usage
 
 For more complex and dynamic queries it's good practice to create functions that use the DSL to make queries more readable,
 and to allow for their composition in complex dynamic queries.
@@ -157,33 +164,96 @@ For powerful dynamic queries:
     val shows = tvShowRepo.findAll(query.toSpecification())
 ```
 
-For more details, refer to `JPASpecificationDSLTest.kt` in the unit tests.
+For more details and examples, refer to `JPASpecificationDSLIntTest.kt` in the unit tests.
 
-# How it works #
+### Spring Data Common DSL
 
-This DSL builds on [Spring Data's Specifications abstraction](http://docs.spring.io/spring-data/jpa/docs/current/reference/html/#specifications),
-sprinkling some Kotlin sugar over it to remove the boilerplate and the need to generate a metamodel.
+```kotlin
+import io.github.petitcl.springdata.commondsl.*   // 1. Import extension functions
+import org.springframework.data.domain.Page
+import org.springframework.data.repository.CrudRepository
+import org.springframework.data.repository.PagingAndSortingRepository
+import org.springframework.stereotype.Repository
+import org.springframework.stereotype.Service
+import javax.persistence.*
 
-The basic idea is to add extension functions to Kotlin's `KProperty` class, which is the reflection API representation of a Kotlin property.
-The extension functions each represent a database operator (eg: `equal`, `like`, `greaterThan`, etc...) and are then used to build a `Specification` object,
-which is then passed to the Spring Data repository.
+// 2. Declare JPA Entities
+@Entity
+data class Actor(
+    @Id
+    @GeneratedValue
+    val id: Int = 0,
+    val firstName: String = "",
+    val lastName: String = "",
+    val birthYear: String? = "",
+)
 
-For example, The code `TvShow::releaseDate.equal("2010")` is a call to the Kotlin extension function:
+// 3. Declare Repository (with PagingAndSortingRepository or JpaSpecificationExecutor)
+@Repository
+interface ActorRepository : CrudRepository<Actor, Int>, PagingAndSortingRepository<Actor, Int>
 
+// 4. Kotlin Properties are now usable to create fluent specifications
+@Service
+class MyService constructor(val actorRepo: ActorRepository) {
+
+    /* Using sort only */
+    fun findAllActorsSortedByLastName(): List<Actor> {
+        return actorRepo.findAll(sortedBy(Actor::lastName.asc())).toList()
+    }
+
+    /* Using pagination only */
+    fun findFirst10Actors(): Page<Actor> {
+        return actorRepo.findAll(paged(page = 0, size = 10))
+    }
+
+    /* or, if you prefer */
+    fun findFirst10Actors2(): Page<Actor> {
+        return actorRepo.findAll(limit(10))
+    }
+
+    /* Using pagination + sort */
+    fun findFirst10ActorsByBirthDate(): Page<Actor> {
+        return actorRepo.findAll(sortedBy(Actor::birthYear.asc()).paged(page = 0, size = 10))
+    }
+
+    /* or, if you prefer */
+    fun findFirst10ActorsByBirthDate2(): Page<Actor> {
+        return actorRepo.findAll(paged(page = 0, size = 10).sortedBy(Actor::birthYear.asc()))
+    }
+
+}
+```
+
+
+## How it works
+
+The basic idea of all the DSLs in this repository is to use Kotlin property references in order to build type safe queries, pagination and sorting.
+Spring Data only supports referencing entity properties by name, which is not type safe and can lead to runtime errors.
+For example, if you rename a property in your entity, the query will still compile, but will fail at runtime, since the old field does exist anymore.
+On top of that, Spring Data queries can be quite verbose in some cases (eg: JPA specifications), especially when used in a Kotlin project.
+
+The DSLs are based on two simple mechanisms:
+- Kotlin Property references, more specifically the `KProperty` class. Property references are compile type references that can be read at runtime. 
+For example, if we have an entity class named `TvShow`, we can create a compile time reference, `TvShow::releaseDate`, which will be of type `KProperty1<T,R?>`.
+We can then read the name of the field using `KProperty1<T,R?>.name`, which will return the name of the field as a String.
+If the field name changes, the code will not compile anymore, until the property is correctly referenced.
+- Extension functions on the `KProperty` class.
+We can add extension functions on the `KProperty1` that allow to create Spring Data query objects that reference the name of the field. 
+Given this is a reference checked by the compiler, we can guarantee that the field name is correct at runtime.
+
+
+### JPA specification
+
+This JPA DSL builds on [Spring Data's Specifications abstraction](http://docs.spring.io/spring-data/jpa/docs/current/reference/html/#specifications),
+combined with the `KProperty` extension methods mentioned above, to remove the boilerplate and the need to generate a metamodel.
+
+For example, the `equal` extension function is defined as follows:
 ```kotlin
 fun <T, R> KProperty1<T, R?>.equal(x: R): Specification<T> = spec { equal(it, x) }
 ```
 
-This is a bit dense, but makes sense when it's broken down:
-
-- `T`: The type of the object that the property is declared on, in this case TvShow
-- `R`: The property type, for TvShow::releaseDate it is String
-- `KProperty1<T,R?>`: Kotlin reflection API representation of the property `TvShow::releaseDate`. 
-The 1 refers to a property with 1 receiver, and `R?` is declared as nullable for the method to work on nullable properties as well as non-null properties.
-- `x`: The value to test against
-- `Specification<T>`: The Spring data specifications result
-
-This is implemented using a private helper function `spec` that captures the common use case of taking an Entity property, and using a `CriteriaBuilder` to create a `Predicate`:
+This is implemented using a private helper function `spec` that captures the common use case of taking an Entity property,
+and using a `CriteriaBuilder` to create a `Predicate`:
 
 ```kotlin
 private fun <T, R> KProperty1<T, R?>.spec(makePredicate: CriteriaBuilder.(path: Path<R>) -> Predicate): Specification<T> =
@@ -198,30 +268,26 @@ Once it has a `Path<R>` to work with, it delegates to the `makePredicate` functi
 
 The `makePredicate` function passed to `spec` is an extension function on `CriteraiBuilder`. So when `equal(it, x)` is called from inside the `spec` block, it is invoking `CriteriaBuilder::equal`.
 
-
-# TODO
-- DSL for doing query + sort + paging
-- Different modules for JPA / Spring Data common
-- Publish to Maven / Github
-
-# Contributing to the Project #
+## Contributing to the Project
 
 If you'd like to contribute code to this project you can do so through GitHub by forking the repository and generating a pull request.
 
 By contributing your code, you agree to license your contribution under the terms of the Apache License v2.0. 
 
-# License #
+## License
 
-Copyright 2016 RES INFORMATION SERVICES PTY LTD
+```text
+    Copyright 2023 Clément Petit 
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-http://www.apache.org/licenses/LICENSE-2.0
+       http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+```
