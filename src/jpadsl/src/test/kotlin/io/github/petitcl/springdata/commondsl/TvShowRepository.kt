@@ -48,7 +48,7 @@ fun availableOnNetflix(available: Boolean?): Specification<TvShow>? = available?
 }
 
 fun hasReleaseDateIn(releaseDates: List<String>?): Specification<TvShow>? = releaseDates?.let {
-    TvShow::releaseDate.`in`(releaseDates)
+    TvShow::releaseDate.isIn(releaseDates)
 }
 
 fun hasKeywordIn(keywords: List<String>?): Specification<TvShow>? = keywords?.let {

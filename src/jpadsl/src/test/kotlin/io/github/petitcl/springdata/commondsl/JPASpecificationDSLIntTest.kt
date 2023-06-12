@@ -109,7 +109,7 @@ open class JPASpecificationDSLIntTest {
 
     @Test
     fun `Get tv show by id in`() {
-        val shows = tvShowRepo.findAll(TvShow::id.`in`(setOf(hemlockGrove.id, theWalkingDead.id)))
+        val shows = tvShowRepo.findAll(TvShow::id.isIn(setOf(hemlockGrove.id, theWalkingDead.id)))
         assertThat(shows, containsInAnyOrder(hemlockGrove, theWalkingDead))
     }
 
@@ -329,4 +329,12 @@ open class JPASpecificationDSLIntTest {
         assertThat(shows, containsInAnyOrder(betterCallSaul, hemlockGrove))
     }
 
+
+    fun test() {
+        tvShowRepo.findAll(
+            where {
+                root -> root.get(TvShow::name).equal(root.get(TvShow::synopsis))
+            }
+        )
+    }
 }
