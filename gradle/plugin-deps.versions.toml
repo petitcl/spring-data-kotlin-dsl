@@ -1,7 +1,7 @@
 [versions]
 gradleDetekt = "1.19.0"
 gradleGithook = "1.2.1"
-kotlin = "1.7.20"
+kotlin = "1.8.21"
 
 [libraries]
 gradle-detekt = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "gradleDetekt" }
