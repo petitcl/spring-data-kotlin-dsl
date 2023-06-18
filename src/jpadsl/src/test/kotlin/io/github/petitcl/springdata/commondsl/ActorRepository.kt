@@ -3,9 +3,9 @@ package io.github.petitcl.springdata.commondsl
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
+import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.Id
 
 @Repository
 interface ActorRepository : CrudRepository<Actor, Int>, JpaSpecificationExecutor<Actor>

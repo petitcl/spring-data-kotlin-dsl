@@ -1,7 +1,7 @@
 package io.github.petitcl.springdata.commondsl
 
 import org.springframework.data.jpa.domain.Specification
-import javax.persistence.criteria.*
+import jakarta.persistence.criteria.*
 import kotlin.reflect.KProperty1
 
 // Version of Specification.where that makes the CriteriaBuilder implicit

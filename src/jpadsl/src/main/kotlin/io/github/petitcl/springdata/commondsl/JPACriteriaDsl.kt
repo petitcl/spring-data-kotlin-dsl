@@ -1,6 +1,6 @@
 package io.github.petitcl.springdata.commondsl
 
-import javax.persistence.criteria.*
+import jakarta.persistence.criteria.*
 import kotlin.reflect.KProperty1
 
 // Joining

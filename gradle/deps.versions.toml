@@ -1,10 +1,10 @@
 [versions]
-jakartaPersistenceApi = "2.2.3"
+jakartaPersistenceApi = "3.1.0"
 junit = "5.5.2"
 kotlin = "1.8.21"
 h2 = "1.4.191"
-springData = "2.7.12"
-springBoot = "2.7.12"
+springData = "3.1.0"
+springBoot = "3.1.0"
 
 [libraries]
 # Kotlin
