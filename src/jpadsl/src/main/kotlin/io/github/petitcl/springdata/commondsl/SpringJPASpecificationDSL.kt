@@ -4,61 +4,77 @@ import org.springframework.data.jpa.domain.Specification
 import jakarta.persistence.criteria.*
 import kotlin.reflect.KProperty1
 
+interface SpringJPASpecificationDSL<T> : JPACriteriaDsl {
+    val root: Root<T>
+}
+
 // Version of Specification.where that makes the CriteriaBuilder implicit
-fun <T> where(makePredicate: CriteriaBuilder.(Root<T>) -> Predicate): Specification<T> =
-    Specification { root, _, criteriaBuilder -> criteriaBuilder.makePredicate(root) }
+fun <T> where(makePredicate: SpringJPASpecificationDSL<T>.() -> Predicate): Specification<T> =
+    Specification { root, query, criteriaBuilder ->
+        SpringJPASpecificationDSLImpl(root, query, criteriaBuilder).makePredicate()
+    }
+
+private data class SpringJPASpecificationDSLImpl<T>(
+    override val root: Root<T>,
+    override val query: CriteriaQuery<*>,
+    override val builder: CriteriaBuilder
+) : SpringJPASpecificationDSL<T>
 
 // helper function for defining Specification that take a Path to a property and send it to a CriteriaBuilder
-private fun <T, R> KProperty1<T, R?>.spec(makePredicate: CriteriaBuilder.(path: Path<R>) -> Predicate): Specification<T> =
-    let { property -> where { root -> makePredicate(root.get(property)) } }
+private fun <T, R> KProperty1<T, R?>.spec(makePredicate: SpringJPASpecificationDSL<T>.(path: Path<R>) -> Predicate): Specification<T> =
+    let { property -> where { makePredicate(root.get(property)) } }
 
 // Equality
-fun <T, R> KProperty1<T, R?>.equal(x: R): Specification<T> = spec { equal(it, x) }
+fun <T, R> KProperty1<T, R?>.equal(x: R): Specification<T> = spec { builder.equal(it, x) }
 
-fun <T, R> KProperty1<T, R?>.notEqual(x: R): Specification<T> = spec { notEqual(it, x) }
+fun <T, R> KProperty1<T, R?>.notEqual(x: R): Specification<T> = spec { builder.notEqual(it, x) }
 
 // Ignores empty collection otherwise an empty 'in' predicate will be generated which will never match any results
-fun <T, R : Any> KProperty1<T, R?>.isIn(values: Collection<R>): Specification<T> =
+fun <T, R> KProperty1<T, R?>.isIn(values: Collection<R>): Specification<T> =
     if (values.isNotEmpty()) spec { path ->
-        `in`(path).apply { values.forEach { this.value(it) } }
+        builder.`in`(path).apply { values.forEach { this.value(it) } }
     } else Specification.where(null)
 
-fun <T, R : Any> KProperty1<T, R?>.isNotIn(values: Collection<R>): Specification<T> =
+fun <T, R> KProperty1<T, R?>.isNotIn(values: Collection<R>): Specification<T> =
     if (values.isNotEmpty()) spec { path ->
-        `in`(path).apply { values.forEach { this.value(it) } }.not()
+        builder.`in`(path).apply { values.forEach { this.value(it) } }.not()
     } else Specification.where(null)
 
 // Comparison
-fun <T> KProperty1<T, Number?>.le(x: Number): Specification<T> = spec { le(it, x) }
-fun <T> KProperty1<T, Number?>.lt(x: Number): Specification<T> = spec { lt(it, x) }
-fun <T> KProperty1<T, Number?>.ge(x: Number): Specification<T> = spec { ge(it, x) }
-fun <T> KProperty1<T, Number?>.gt(x: Number): Specification<T> = spec { gt(it, x) }
-fun <T, R : Comparable<R>> KProperty1<T, R?>.lessThan(x: R): Specification<T> = spec { lessThan(it, x) }
-fun <T, R : Comparable<R>> KProperty1<T, R?>.lessThanOrEqualTo(x: R): Specification<T> = spec { lessThanOrEqualTo(it, x) }
-fun <T, R : Comparable<R>> KProperty1<T, R?>.greaterThan(x: R): Specification<T> = spec { greaterThan(it, x) }
-fun <T, R : Comparable<R>> KProperty1<T, R?>.greaterThanOrEqualTo(x: R): Specification<T> = spec { greaterThanOrEqualTo(it, x) }
-fun <T, R : Comparable<R>> KProperty1<T, R?>.between(x: R, y: R): Specification<T> = spec { between(it, x, y) }
+fun <T> KProperty1<T, Number?>.le(x: Number): Specification<T> = spec { builder.le(it, x) }
+fun <T> KProperty1<T, Number?>.lt(x: Number): Specification<T> = spec { builder.lt(it, x) }
+fun <T> KProperty1<T, Number?>.ge(x: Number): Specification<T> = spec { builder.ge(it, x) }
+fun <T> KProperty1<T, Number?>.gt(x: Number): Specification<T> = spec { builder.gt(it, x) }
+fun <T, R : Comparable<R>> KProperty1<T, R?>.lessThan(x: R): Specification<T> = spec { builder.lessThan(it, x) }
+fun <T, R : Comparable<R>> KProperty1<T, R?>.lessThanOrEqualTo(x: R): Specification<T> =
+    spec { builder.lessThanOrEqualTo(it, x) }
+
+fun <T, R : Comparable<R>> KProperty1<T, R?>.greaterThan(x: R): Specification<T> = spec { builder.greaterThan(it, x) }
+fun <T, R : Comparable<R>> KProperty1<T, R?>.greaterThanOrEqualTo(x: R): Specification<T> =
+    spec { builder.greaterThanOrEqualTo(it, x) }
+
+fun <T, R : Comparable<R>> KProperty1<T, R?>.between(x: R, y: R): Specification<T> = spec { builder.between(it, x, y) }
 
 // True/False
-fun <T> KProperty1<T, Boolean?>.isTrue(): Specification<T> = spec { isTrue(it) }
-fun <T> KProperty1<T, Boolean?>.isFalse(): Specification<T> = spec { isFalse(it) }
+fun <T> KProperty1<T, Boolean?>.isTrue(): Specification<T> = spec { builder.isTrue(it) }
+fun <T> KProperty1<T, Boolean?>.isFalse(): Specification<T> = spec { builder.isFalse(it) }
 
 // Null / NotNull
-fun <T, R> KProperty1<T, R?>.isNull(): Specification<T> = spec { isNull(it) }
-fun <T, R> KProperty1<T, R?>.isNotNull(): Specification<T> = spec { isNotNull(it) }
+fun <T, R> KProperty1<T, R?>.isNull(): Specification<T> = spec { builder.isNull(it) }
+fun <T, R> KProperty1<T, R?>.isNotNull(): Specification<T> = spec { builder.isNotNull(it) }
 
 // Collections
-fun <T, R : Collection<*>> KProperty1<T, R?>.isEmpty(): Specification<T> = spec { isEmpty(it) }
-fun <T, R : Collection<*>> KProperty1<T, R?>.isNotEmpty(): Specification<T> = spec { isNotEmpty(it) }
-fun <T, E, R : Collection<E>> KProperty1<T, R?>.isMember(elem: E): Specification<T> = spec { isMember(elem, it) }
-fun <T, E, R : Collection<E>> KProperty1<T, R?>.isNotMember(elem: E): Specification<T> = spec { isNotMember(elem, it) }
+fun <T, R : Collection<*>> KProperty1<T, R?>.isEmpty(): Specification<T> = spec { builder.isEmpty(it) }
+fun <T, R : Collection<*>> KProperty1<T, R?>.isNotEmpty(): Specification<T> = spec { builder.isNotEmpty(it) }
+fun <T, E, R : Collection<E>> KProperty1<T, R?>.isMember(elem: E): Specification<T> = spec { builder.isMember(elem, it) }
+fun <T, E, R : Collection<E>> KProperty1<T, R?>.isNotMember(elem: E): Specification<T> = spec { builder.isNotMember(elem, it) }
 
 // Strings
-fun <T> KProperty1<T, String?>.like(x: String): Specification<T> = spec { like(it, x) }
-fun <T> KProperty1<T, String?>.like(x: String, escapeChar: Char): Specification<T> = spec { like(it, x, escapeChar) }
-fun <T> KProperty1<T, String?>.notLike(x: String): Specification<T> = spec { notLike(it, x) }
+fun <T> KProperty1<T, String?>.like(x: String): Specification<T> = spec { builder.like(it, x) }
+fun <T> KProperty1<T, String?>.like(x: String, escapeChar: Char): Specification<T> = spec { builder.like(it, x, escapeChar) }
+fun <T> KProperty1<T, String?>.notLike(x: String): Specification<T> = spec { builder.notLike(it, x) }
 fun <T> KProperty1<T, String?>.notLike(x: String, escapeChar: Char): Specification<T> =
-    spec { notLike(it, x, escapeChar) }
+    spec { builder.notLike(it, x, escapeChar) }
 
 // And
 infix fun <T> Specification<T>.and(other: Specification<T>): Specification<T> = this.and(other)

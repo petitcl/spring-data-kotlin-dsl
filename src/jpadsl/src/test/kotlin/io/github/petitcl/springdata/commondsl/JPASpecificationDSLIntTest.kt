@@ -3,6 +3,7 @@ package io.github.petitcl.springdata.commondsl
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.empty
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -258,9 +259,63 @@ open class JPASpecificationDSLIntTest {
     }
 
     @Test
-    fun `Test Join`() {
-        val shows = tvShowRepo.findAll(where { equal(it.join(TvShow::starRatings).get(StarRating::stars), 2) })
+    fun `Join with equal clause on value`() {
+        val shows = tvShowRepo.findAll(where {
+            val join = root.join(TvShow::starRatings)
+            join.get(StarRating::stars).equal(2)
+        })
         assertThat(shows, containsInAnyOrder(betterCallSaul))
+    }
+
+    @Test
+    fun `Join with equal clause on expression`() {
+        val shows = tvShowRepo.findAll(where {
+            val join = root.join(TvShow::starRatings)
+            join.get(StarRating::stars).equal(join.get(StarRating::stars))
+        })
+        assertThat(shows, containsInAnyOrder(theWalkingDead, betterCallSaul))
+    }
+
+    @Test
+    fun `Join with notEqual clause on value`() {
+        val shows = tvShowRepo.findAll(where {
+            val join = root.join(TvShow::starRatings)
+            join.get(StarRating::stars).notEqual(2)
+        })
+        assertThat(shows, containsInAnyOrder(theWalkingDead, betterCallSaul))
+    }
+
+    @Test
+    fun `Join with notEqual clause on expression`() {
+        val shows = tvShowRepo.findAll(where {
+            val join = root.join(TvShow::starRatings)
+            join.get(StarRating::stars).notEqual(join.get(StarRating::stars))
+        })
+        assertThat(shows, empty())
+    }
+
+    @Test
+    fun `Join with multiple clause combined with and`() {
+        val shows = tvShowRepo.findAll(where {
+            val join = root.join(TvShow::starRatings)
+            and(
+                join.get(StarRating::stars).greaterThan(2),
+                join.get(StarRating::stars).lessThan(4)
+            )
+        })
+        assertThat(shows, containsInAnyOrder(theWalkingDead))
+    }
+
+    @Test
+    fun `Join with multiple clause combined with or`() {
+        val shows = tvShowRepo.findAll(where {
+            val join = root.join(TvShow::starRatings)
+            or(
+                join.get(StarRating::stars).greaterThan(2),
+                join.get(StarRating::stars).lessThan(4)
+            )
+        })
+        assertThat(shows, containsInAnyOrder(theWalkingDead, betterCallSaul))
     }
 
     @Test
@@ -329,12 +384,4 @@ open class JPASpecificationDSLIntTest {
         assertThat(shows, containsInAnyOrder(betterCallSaul, hemlockGrove))
     }
 
-
-    fun test() {
-        tvShowRepo.findAll(
-            where {
-                root -> root.get(TvShow::name).equal(root.get(TvShow::synopsis))
-            }
-        )
-    }
 }
