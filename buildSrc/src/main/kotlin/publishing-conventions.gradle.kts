@@ -4,7 +4,6 @@ plugins {
     id("signing")
 }
 
-
 group = "io.github.petitcl"
 version = if (System.getenv("NEW_VERSION") != null) { System.getenv("NEW_VERSION") } else { "0.0.1-SNAPSHOT" }
 
@@ -48,5 +47,5 @@ signing {
     val signingKey: String? by project
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
-    sign(publishing.publications["maven"])
+    sign(publishing.publications["mavenJava"])
 }
