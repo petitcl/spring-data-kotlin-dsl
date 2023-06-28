@@ -1,5 +1,6 @@
 plugins {
     id("kotlin-lib-conventions")
+    id("publishing-conventions")
 }
 
 dependencies {

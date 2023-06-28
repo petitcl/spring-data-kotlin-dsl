@@ -1,33 +1,47 @@
 plugins {
     `maven-publish`
     signing
+    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
 }
 
-publishing {
+group = "io.github.petitcl"
+
+nexusPublishing {
+    packageGroup.set("io.github.petitcl")
     repositories {
-        maven {
-            name = "OSSRH"
-            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-//            credentials {
-//                username = System.getenv("MAVEN_USERNAME")
-//                password = System.getenv("MAVEN_PASSWORD")
-//            }
-        }
-    }
-
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = "io.github.petitcl"
-            artifactId = project.name
-            version = System.getenv("NEW_VERSION")
+        sonatype {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+//            System.getenv("ORG_GRADLE_PROJECT_sonatypeUsername")?.let { username.set(it) }
+//            System.getenv("ORG_GRADLE_PROJECT_sonatypePassword")?.let { password.set(it) }
         }
     }
 }
 
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
+//subprojects {
+////    plugins {
+////        `maven-publish`
+////        signing
+////        id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
+////    }
+//
+////    publishing {
+////        publications {
+////            create<MavenPublication>("maven") {
+////                from(components["java"])
+////                groupId = "io.github.petitcl"
+////                artifactId = project.name
+////                version = System.getenv("NEW_VERSION")
+////            }
+////        }
+////    }
+//}
 
-    sign(publishing.publications["maven"])
-}
+//
+//signing {
+//    val signingKey: String? by project
+//    val signingPassword: String? by project
+//    useInMemoryPgpKeys(signingKey, signingPassword)
+//
+//    sign(publishing.publications["maven"])
+//}

@@ -1,7 +1,9 @@
 rootProject.name = 'spring-data-kotlin-dsl'
 
 include("src:commondsl")
+project(":src:commondsl").name = "spring-data-common-kotlin-dsl"
 include("src:jpadsl")
+project(":src:jpadsl").name = "spring-data-jpa-kotlin-dsl"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 dependencyResolutionManagement {
