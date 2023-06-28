@@ -3,14 +3,6 @@ plugins {
     signing
 }
 
-signing {
-    val signingKey: String? by project
-    val signingPassword: String? by project
-    useInMemoryPgpKeys(signingKey, signingPassword)
-
-    sign(publishing.publications["mavenJava"])
-}
-
 publishing {
     repositories {
         maven {
@@ -22,4 +14,21 @@ publishing {
             }
         }
     }
+
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "io.github.petitcl"
+            artifactId = project.getName()
+            version = System.getenv("NEW_VERSION")
+        }
+    }
+}
+
+signing {
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    useInMemoryPgpKeys(signingKey, signingPassword)
+
+    println("publishing.publications: ${publishing.publications.asMap}")
+    sign(publishing.publications["maven"])
 }
