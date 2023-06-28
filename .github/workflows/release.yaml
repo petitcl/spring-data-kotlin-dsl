@@ -17,14 +17,10 @@ jobs:
       - name: Publish package
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          arguments: -Pversion=${NEW_VERSION} publishToSonatype closeAndReleaseSonatypeStagingRepository
+          arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.OSSRH_PASSWORD }}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.OSSRH_USERNAME }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_PGP_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.OSSRH_PGP_KEY_PASSPHRASE }}
           NEW_VERSION: ${{ github.event.release.tag_name }}
-#        env:
-#          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-#          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-#          NEW_VERSION: ${{ github.event.release.tag_name }}
