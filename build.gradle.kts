@@ -12,8 +12,6 @@ nexusPublishing {
         sonatype {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-//            System.getenv("ORG_GRADLE_PROJECT_sonatypeUsername")?.let { username.set(it) }
-//            System.getenv("ORG_GRADLE_PROJECT_sonatypePassword")?.let { password.set(it) }
         }
     }
 }
