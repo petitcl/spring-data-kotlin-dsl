@@ -18,7 +18,7 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             groupId = "io.github.petitcl"
-            artifactId = project.getName()
+            artifactId = project.name
             version = System.getenv("NEW_VERSION")
         }
     }
@@ -29,6 +29,5 @@ signing {
     val signingPassword: String? by project
     useInMemoryPgpKeys(signingKey, signingPassword)
 
-    println("publishing.publications: ${publishing.publications.asMap}")
     sign(publishing.publications["maven"])
 }

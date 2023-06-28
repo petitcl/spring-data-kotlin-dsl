@@ -19,8 +19,8 @@ jobs:
         with:
           arguments: -Pversion=${NEW_VERSION} build publish
         env:
-          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.OSSRH_USERNAME }}
-          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.OSSRH_TOKEN }}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.OSSRH_PASSWORD }}
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.OSSRH_USERNAME }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_PGP_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.OSSRH_PGP_KEY_PASSPHRASE }}
           NEW_VERSION: ${{ github.event.release.tag_name }}
