@@ -6,25 +6,22 @@
 This library provides fluent and type safe DSLs for working with Spring Data repositories, without boilerplate code or generated metamodel / compiler plugins.
 This library currently offers the following DSLs:
 - Spring Data Common Paging and Sorting DSL
-- Spring Data JPA specification DSL, based on the JPA Criteria API
+- JPA Criteria API DSL
+- Spring Data JPA specification DSL
 
 Originally, this library started as a fork of [consoleau/kotlin-jpa-specification-dsl](https://github.com/consoleau/kotlin-jpa-specification-dsl),
 in order to add support for Spring Boot 3.x, but it evolved into a set of DSLs for Spring Data Common and Spring Data JPA.
 
 ## Quick Start
 
-```kotlin
-dependencies {
-    implementation("io.github.petitcl:spring-data-jpa-kotlin-dsl:$springDataJpaKotlinDslVersion")
-}
+```
+implementation("io.github.petitcl:spring-data-jpa-kotlin-dsl:$springDataJpaKotlinDslVersion")
 ```
 
 Or, if you just want to use the Spring Data Common DSL:
-```kotlin
-dependencies {
-    implementation("io.github.petitcl:spring-data-common-kotlin-dsl:$springDataCommonKotlinDslVersion")
-}
 ```
+implementation("io.github.petitcl:spring-data-common-kotlin-dsl:$springDataCommonKotlinDslVersion")
+``` 
 
 
 ## Spring Data JPA specification DSL
@@ -240,31 +237,75 @@ We can add extension functions on the `KProperty1` that allow to create Spring D
 Given this is a reference checked by the compiler, we can guarantee that the field name is correct at runtime.
 
 
-### JPA specification
+### Spring JPA specification DSL
 
-This JPA DSL builds on [Spring Data's Specifications abstraction](http://docs.spring.io/spring-data/jpa/docs/current/reference/html/#specifications),
+This Spring JPA DSL builds on [Spring Data's Specifications abstraction](http://docs.spring.io/spring-data/jpa/docs/current/reference/html/#specifications),
 combined with the `KProperty` extension methods mentioned above, to remove the boilerplate and the need to generate a metamodel.
 
 For example, the `equal` extension function is defined as follows:
 ```kotlin
-fun <T, R> KProperty1<T, R?>.equal(x: R): Specification<T> = spec { equal(it, x) }
+fun <T, R> KProperty1<T, R?>.equal(x: R): Specification<T> = spec { builder.equal(it, x) }
 ```
 
 This is implemented using a private helper function `spec` that captures the common use case of taking an Entity property,
-and using a `CriteriaBuilder` to create a `Predicate`:
+and using a JPA `CriteriaBuilder` to create a JPA `Predicate`. 
 
+### JPA Criteria API DSL
+
+For more advance JPA query use cases, for example in case of joins or aggregations, this module also provides a DSL for the [JPA Criteria API](https://www.baeldung.com/hibernate-criteria-queries) directly. 
+
+In order to use this DSL, it is required to call the `where` function, and provide it a lambda that returns the desired complex query. 
+The catch here is that this operation is at a different level of abstraction than the JPA DSL. More specifically, the Spring JPA DSL works with `Specifications`, while the JPA Criteria API works with `Predicates`.
+Therefore, this library redefines the same functions as for Spring JPA (`Specification` based), but this time with `Predicate` instead.
+
+For example, here is the JPA Criteria DSL equivalent of the `equal` function presented earlier:
 ```kotlin
-private fun <T, R> KProperty1<T, R?>.spec(makePredicate: CriteriaBuilder.(path: Path<R>) -> Predicate): Specification<T> =
-    this.let { property -> where { root -> makePredicate(root.get(property)) } }
+context(JPACriteriaDsl)
+fun <R> Expression<R>.equal(value: R): Predicate = builder.equal(this, value)
 ```
 
-This uses the `where` factory method, which expects a callback with the signature: `CriteriaBuilder.(Root<T>) -> Predicate`
 
-The code converts a `KProperty1<T,R>` to a `Path<T>` using `root.get<R>(property)`.
+The advanced query usage looks like this:
+```kotlin
+// Fetch all TvSHows, joining on StarRatings, and keeping only rows that have a StarRating > 2 or < 4
+val shows = tvShowRepo.findAll(where {
+    val join = root.innerJoin(TvShow::starRatings)
+    or(
+        join.get(StarRating::stars).greaterThan(2),
+        join.get(StarRating::stars).lessThan(4)
+    )
+})
+```
 
-Once it has a `Path<R>` to work with, it delegates to the `makePredicate` function to configure the `CriteriaBuilder` given the `Path`.
 
-The `makePredicate` function passed to `spec` is an extension function on `CriteriaBuilder`. So when `equal(it, x)` is called from inside the `spec` block, it is invoking `CriteriaBuilder::equal`.
+:warning: Warning: this particular feature set is based on context receivers and that requires context receivers to be enabled in your project.
+
+
+### Creating your own operators / extensions
+It is possible that you will want to create you own custom operators or extensions, or that the library does not (yet) cover some existing operator (contributions are welcome!). In that case, you can very simply define your own function.
+
+For example, let's imagine you want to create a new operation `betweenExclusive`, that does the same as `between`, except that it does not match if the values are equal to the range bounds. That operation can simply be implemented in terms of `lessThanOrEqualTo` and `greaterThanOrEqualTo`.
+
+You would simply need to create the following extension in order to make this new operation available in the Spring Data JPA DSL: 
+
+```kotlin
+fun <T, R : Comparable<R>> KProperty1<T, R?>.betweenExclusive(x: R, y: R): Specification<T> = spec {
+    and(
+        builder.greaterThanOrEqualTo(it, x),
+        builder.lessThanOrEqualTo(it, y)
+    )
+}
+```
+
+And you would need to create this extension in order to make this new operation available in the Jpa Criteria API: 
+```kotlin
+context(JPACriteriaDsl)
+fun <R> Expression<R>.betweenExclusive(x: R, y: R): Predicate = and(
+        builder.greaterThanOrEqualTo(this, x),
+        builder.lessThanOrEqualTo(this, y)
+)
+```
+
 
 ## Contributing to the Project
 
