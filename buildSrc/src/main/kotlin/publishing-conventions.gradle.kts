@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.petitcl"
-version = if (System.getenv("NEW_VERSION") != null) { System.getenv("NEW_VERSION") } else { "0.0.1-SNAPSHOT" }
+version = if (System.getenv("NEW_VERSION") != null) { System.getenv("NEW_VERSION").removePrefix("v") } else { "0.0.1-SNAPSHOT" }
 
 repositories {
     mavenCentral()
