@@ -63,18 +63,28 @@ fun <R : Number> Path<R>.gt(x: Number): Predicate = builder.gt(this, x)
 
 context(JPACriteriaDsl)
 fun <R : Comparable<R>> Path<R>.lessThan(x: R): Predicate = builder.lessThan(this, x)
+context(JPACriteriaDsl)
+fun <R : Comparable<R>> Path<R>.lessThan(x: Expression<R>): Predicate = builder.lessThan(this, x)
 
 context(JPACriteriaDsl)
 fun <R : Comparable<R>> Path<R>.lessThanOrEqualTo(x: R): Predicate = builder.lessThanOrEqualTo(this, x)
+context(JPACriteriaDsl)
+fun <R : Comparable<R>> Path<R>.lessThanOrEqualTo(x: Expression<R>): Predicate = builder.lessThanOrEqualTo(this, x)
 
 context(JPACriteriaDsl)
 fun <R : Comparable<R>> Path<R>.greaterThan(x: R): Predicate = builder.greaterThan(this, x)
+context(JPACriteriaDsl)
+fun <R : Comparable<R>> Path<R>.greaterThan(x: Expression<R>): Predicate = builder.greaterThan(this, x)
 
 context(JPACriteriaDsl)
 fun <R : Comparable<R>> Path<R>.greaterThanOrEqualTo(x: R): Predicate = builder.greaterThanOrEqualTo(this, x)
+context(JPACriteriaDsl)
+fun <R : Comparable<R>> Path<R>.greaterThanOrEqualTo(x: Expression<R>): Predicate = builder.greaterThanOrEqualTo(this, x)
 
 context(JPACriteriaDsl)
 fun <R : Comparable<R>> Path<R>.between(x: R, y: R): Predicate = builder.between(this, x, y)
+context(JPACriteriaDsl)
+fun <R : Comparable<R>> Path<R>.between(x: Expression<R>, y: Expression<R>): Predicate = builder.between(this, x, y)
 
 // Booleans
 context(JPACriteriaDsl)
