@@ -1,6 +1,7 @@
 package io.github.petitcl.springdata.commondsl
 
 import jakarta.persistence.criteria.*
+import org.springframework.data.jpa.domain.Specification
 import kotlin.reflect.KProperty1
 
 interface JPACriteriaDsl {
@@ -23,6 +24,9 @@ fun and(vararg predicates: Predicate?): Predicate = builder.and(*predicates.filt
 
 context(JPACriteriaDsl)
 fun or(vararg predicates: Predicate?): Predicate = builder.or(*predicates.filterNotNull().toTypedArray())
+
+context(JPACriteriaDsl)
+fun not(vararg predicates: Predicate?): Predicate = builder.or(*predicates.filterNotNull().toTypedArray())
 
 // Equality
 context(JPACriteriaDsl)
@@ -51,15 +55,23 @@ fun <R> Expression<R>.isNotIn(values: Collection<R>): Predicate = if (values.isN
 // Comparison operators
 context(JPACriteriaDsl)
 fun <R : Number> Expression<R>.le(x: Number): Predicate = builder.le(this, x)
+context(JPACriteriaDsl)
+fun <R : Number> Expression<R>.le(x: Expression<Number>): Predicate = builder.le(this, x)
 
 context(JPACriteriaDsl)
 fun <R : Number> Expression<R>.lt(x: Number): Predicate = builder.lt(this, x)
+context(JPACriteriaDsl)
+fun <R : Number> Expression<R>.lt(x: Expression<Number>): Predicate = builder.lt(this, x)
 
 context(JPACriteriaDsl)
 fun <R : Number> Expression<R>.ge(x: Number): Predicate = builder.ge(this, x)
+context(JPACriteriaDsl)
+fun <R : Number> Expression<R>.ge(x: Expression<Number>): Predicate = builder.ge(this, x)
 
 context(JPACriteriaDsl)
 fun <R : Number> Expression<R>.gt(x: Number): Predicate = builder.gt(this, x)
+context(JPACriteriaDsl)
+fun <R : Number> Expression<R>.gt(x: Expression<Number>): Predicate = builder.gt(this, x)
 
 context(JPACriteriaDsl)
 fun <R : Comparable<R>> Expression<R>.lessThan(x: R): Predicate = builder.lessThan(this, x)
@@ -92,6 +104,17 @@ fun Expression<Boolean>.isTrue(): Predicate = builder.isTrue(this)
 
 context(JPACriteriaDsl)
 fun Expression<Boolean>.isFalse(): Predicate = builder.isFalse(this)
+
+// Collections
+context(JPACriteriaDsl)
+fun <R : Collection<R>> Expression<R>.isEmpty(): Predicate = builder.isEmpty(this)
+context(JPACriteriaDsl)
+fun <R : Collection<R>> Expression<R>.isNotEmpty(): Predicate = builder.isEmpty(this)
+context(JPACriteriaDsl)
+fun <R : Collection<R>, E> Expression<R>.hasMember(elem: E): Predicate = builder.isMember(elem, this)
+context(JPACriteriaDsl)
+fun <R : Collection<R>, E> Expression<R>.hasNoMember(elem: E): Predicate = builder.isNotMember(elem, this)
+
 
 // Strings
 context(JPACriteriaDsl)

@@ -66,8 +66,9 @@ fun <T, R> KProperty1<T, R?>.isNotNull(): Specification<T> = spec { builder.isNo
 // Collections
 fun <T, R : Collection<*>> KProperty1<T, R?>.isEmpty(): Specification<T> = spec { builder.isEmpty(it) }
 fun <T, R : Collection<*>> KProperty1<T, R?>.isNotEmpty(): Specification<T> = spec { builder.isNotEmpty(it) }
-fun <T, E, R : Collection<E>> KProperty1<T, R?>.isMember(elem: E): Specification<T> = spec { builder.isMember(elem, it) }
-fun <T, E, R : Collection<E>> KProperty1<T, R?>.isNotMember(elem: E): Specification<T> = spec { builder.isNotMember(elem, it) }
+fun <T, E, R : Collection<E>> KProperty1<T, R?>.hasMember(elem: E): Specification<T> = spec { builder.isMember(elem, it) }
+fun <T, E, R : Collection<E>> KProperty1<T, R?>.hasNoMember(elem: E): Specification<T> = spec { builder.isNotMember(elem, it) }
+
 
 // Strings
 fun <T> KProperty1<T, String?>.like(x: String): Specification<T> = spec { builder.like(it, x) }
