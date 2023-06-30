@@ -26,82 +26,82 @@ fun or(vararg predicates: Predicate?): Predicate = builder.or(*predicates.filter
 
 // Equality
 context(JPACriteriaDsl)
-fun <R> Path<R>.equal(value: R): Predicate = builder.equal(this, value)
+fun <R> Expression<R>.equal(value: R): Predicate = builder.equal(this, value)
 
 context(JPACriteriaDsl)
-fun <R> Path<R>.equal(expression: Expression<*>): Predicate = builder.equal(this, expression)
+fun <R> Expression<R>.equal(expression: Expression<*>): Predicate = builder.equal(this, expression)
 
 context(JPACriteriaDsl)
-fun <R> Path<R>.notEqual(value: R): Predicate = builder.notEqual(this, value)
+fun <R> Expression<R>.notEqual(value: R): Predicate = builder.notEqual(this, value)
 
 context(JPACriteriaDsl)
-fun <R> Path<R>.notEqual(expression: Expression<R?>): Predicate = builder.notEqual(this, expression)
+fun <R> Expression<R>.notEqual(expression: Expression<*>): Predicate = builder.notEqual(this, expression)
 
 // Ignores empty collection otherwise an empty 'in' predicate will be generated which will never match any results
 context(JPACriteriaDsl)
-fun <R> Path<R>.isIn(values: Collection<R>): Predicate = if (values.isNotEmpty()) {
+fun <R> Expression<R>.isIn(values: Collection<R>): Predicate = if (values.isNotEmpty()) {
     builder.`in`(this).apply { values.forEach { this.value(it) } }
 } else builder.and()
 
 context(JPACriteriaDsl)
-fun <R> Path<R>.isNotIn(values: Collection<R>): Predicate = if (values.isNotEmpty()) {
+fun <R> Expression<R>.isNotIn(values: Collection<R>): Predicate = if (values.isNotEmpty()) {
     builder.`in`(this).apply { values.forEach { this.value(it) } }.not()
 } else builder.and()
 
 // Comparison operators
 context(JPACriteriaDsl)
-fun <R : Number> Path<R>.le(x: Number): Predicate = builder.le(this, x)
+fun <R : Number> Expression<R>.le(x: Number): Predicate = builder.le(this, x)
 
 context(JPACriteriaDsl)
-fun <R : Number> Path<R>.lt(x: Number): Predicate = builder.lt(this, x)
+fun <R : Number> Expression<R>.lt(x: Number): Predicate = builder.lt(this, x)
 
 context(JPACriteriaDsl)
-fun <R : Number> Path<R>.ge(x: Number): Predicate = builder.ge(this, x)
+fun <R : Number> Expression<R>.ge(x: Number): Predicate = builder.ge(this, x)
 
 context(JPACriteriaDsl)
-fun <R : Number> Path<R>.gt(x: Number): Predicate = builder.gt(this, x)
+fun <R : Number> Expression<R>.gt(x: Number): Predicate = builder.gt(this, x)
 
 context(JPACriteriaDsl)
-fun <R : Comparable<R>> Path<R>.lessThan(x: R): Predicate = builder.lessThan(this, x)
+fun <R : Comparable<R>> Expression<R>.lessThan(x: R): Predicate = builder.lessThan(this, x)
 context(JPACriteriaDsl)
-fun <R : Comparable<R>> Path<R>.lessThan(x: Expression<R>): Predicate = builder.lessThan(this, x)
+fun <R : Comparable<R>> Expression<R>.lessThan(x: Expression<R>): Predicate = builder.lessThan(this, x)
 
 context(JPACriteriaDsl)
-fun <R : Comparable<R>> Path<R>.lessThanOrEqualTo(x: R): Predicate = builder.lessThanOrEqualTo(this, x)
+fun <R : Comparable<R>> Expression<R>.lessThanOrEqualTo(x: R): Predicate = builder.lessThanOrEqualTo(this, x)
 context(JPACriteriaDsl)
-fun <R : Comparable<R>> Path<R>.lessThanOrEqualTo(x: Expression<R>): Predicate = builder.lessThanOrEqualTo(this, x)
+fun <R : Comparable<R>> Expression<R>.lessThanOrEqualTo(x: Expression<R>): Predicate = builder.lessThanOrEqualTo(this, x)
 
 context(JPACriteriaDsl)
-fun <R : Comparable<R>> Path<R>.greaterThan(x: R): Predicate = builder.greaterThan(this, x)
+fun <R : Comparable<R>> Expression<R>.greaterThan(x: R): Predicate = builder.greaterThan(this, x)
 context(JPACriteriaDsl)
-fun <R : Comparable<R>> Path<R>.greaterThan(x: Expression<R>): Predicate = builder.greaterThan(this, x)
+fun <R : Comparable<R>> Expression<R>.greaterThan(x: Expression<R>): Predicate = builder.greaterThan(this, x)
 
 context(JPACriteriaDsl)
-fun <R : Comparable<R>> Path<R>.greaterThanOrEqualTo(x: R): Predicate = builder.greaterThanOrEqualTo(this, x)
+fun <R : Comparable<R>> Expression<R>.greaterThanOrEqualTo(x: R): Predicate = builder.greaterThanOrEqualTo(this, x)
 context(JPACriteriaDsl)
-fun <R : Comparable<R>> Path<R>.greaterThanOrEqualTo(x: Expression<R>): Predicate = builder.greaterThanOrEqualTo(this, x)
+fun <R : Comparable<R>> Expression<R>.greaterThanOrEqualTo(x: Expression<R>): Predicate = builder.greaterThanOrEqualTo(this, x)
 
 context(JPACriteriaDsl)
-fun <R : Comparable<R>> Path<R>.between(x: R, y: R): Predicate = builder.between(this, x, y)
+fun <R : Comparable<R>> Expression<R>.between(x: R, y: R): Predicate = builder.between(this, x, y)
 context(JPACriteriaDsl)
-fun <R : Comparable<R>> Path<R>.between(x: Expression<R>, y: Expression<R>): Predicate = builder.between(this, x, y)
+fun <R : Comparable<R>> Expression<R>.between(x: Expression<R>, y: Expression<R>): Predicate = builder.between(this, x, y)
 
 // Booleans
 context(JPACriteriaDsl)
-fun Path<Boolean>.isTrue(): Predicate = builder.isTrue(this)
+fun Expression<Boolean>.isTrue(): Predicate = builder.isTrue(this)
 
 context(JPACriteriaDsl)
-fun Path<Boolean>.isFalse(): Predicate = builder.isFalse(this)
+fun Expression<Boolean>.isFalse(): Predicate = builder.isFalse(this)
 
 // Strings
 context(JPACriteriaDsl)
-fun Path<String>.like(x: String): Predicate = builder.like(this, x)
+fun Expression<String>.like(x: String): Predicate = builder.like(this, x)
 
 context(JPACriteriaDsl)
-fun Path<String>.like(x: String, escapeChar: Char): Predicate = builder.like(this, x, escapeChar)
+fun Expression<String>.like(x: String, escapeChar: Char): Predicate = builder.like(this, x, escapeChar)
 
 context(JPACriteriaDsl)
-fun Path<String>.notLike(x: String): Predicate = builder.notLike(this, x)
+fun Expression<String>.notLike(x: String): Predicate = builder.notLike(this, x)
 
 context(JPACriteriaDsl)
-fun Path<String>.notLike(x: String, escapeChar: Char): Predicate = builder.notLike(this, x, escapeChar)
+fun Expression<String>.notLike(x: String, escapeChar: Char): Predicate = builder.notLike(this, x, escapeChar)
