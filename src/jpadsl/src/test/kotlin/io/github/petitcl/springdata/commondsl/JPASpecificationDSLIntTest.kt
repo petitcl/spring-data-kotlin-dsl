@@ -206,13 +206,13 @@ open class JPASpecificationDSLIntTest {
 
     @Test
     fun `Get tv show by isMember`() {
-        val shows = tvShowRepo.findAll(TvShow::starRatings.isMember(theWalkingDead.starRatings.first()))
+        val shows = tvShowRepo.findAll(TvShow::starRatings.hasMember(theWalkingDead.starRatings.first()))
         assertThat(shows, containsInAnyOrder(theWalkingDead))
     }
 
     @Test
     fun `Get tv show by isNotMember`() {
-        val shows = tvShowRepo.findAll(TvShow::starRatings.isNotMember(betterCallSaul.starRatings.first()))
+        val shows = tvShowRepo.findAll(TvShow::starRatings.hasNoMember(betterCallSaul.starRatings.first()))
         assertThat(shows, containsInAnyOrder(theWalkingDead, hemlockGrove))
     }
 
