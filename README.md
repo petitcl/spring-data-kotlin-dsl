@@ -1,5 +1,3 @@
-### ⚠️⚠️⚠️ **This project is a work in progress.** ⚠️⚠️⚠️
-
 # Spring Data Kotlin DSL
 
 [![Build Status](https://github.com/petitcl/spring-data-kotlin-dsl/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/petitcl/spring-data-kotlin-dsl/actions/workflows/build.yaml/badge.svg?branch=main)
@@ -266,7 +264,7 @@ The code converts a `KProperty1<T,R>` to a `Path<T>` using `root.get<R>(property
 
 Once it has a `Path<R>` to work with, it delegates to the `makePredicate` function to configure the `CriteriaBuilder` given the `Path`.
 
-The `makePredicate` function passed to `spec` is an extension function on `CriteraiBuilder`. So when `equal(it, x)` is called from inside the `spec` block, it is invoking `CriteriaBuilder::equal`.
+The `makePredicate` function passed to `spec` is an extension function on `CriteriaBuilder`. So when `equal(it, x)` is called from inside the `spec` block, it is invoking `CriteriaBuilder::equal`.
 
 ## Contributing to the Project
 
